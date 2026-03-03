@@ -1,22 +1,23 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Karyawan')
+@section('title', 'Edit Karyawan')
 
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-warning">
                 <h5 class="mb-0">
-                    <i class="fas fa-plus-circle me-2"></i>
-                    Form Tambah Karyawan
+                    <i class="fas fa-edit me-2"></i>
+                    Form Edit Karyawan
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('karyawan.store') }}" 
+                <form action="{{ route('karyawan.update', $karyawan) }}" 
                       method="POST" 
                       enctype="multipart/form-data">
                     @csrf
+                    @method('PUT')
 
                     {{-- Pilih Departemen --}}
                     <div class="mb-3">
@@ -29,7 +30,7 @@
                             <option value="">-- Pilih Departemen --</option>
                             @foreach($departemens as $dept)
                                 <option value="{{ $dept->id }}" 
-                                    {{ old('departemen_id') == $dept->id ? 'selected' : '' }}>
+                                    {{ old('departemen_id', $karyawan->departemen_id) == $dept->id ? 'selected' : '' }}>
                                     {{ $dept->nama_departemen }} ({{ $dept->kode_departemen }})
                                 </option>
                             @endforeach
@@ -48,7 +49,7 @@
                                class="form-control @error('nama') is-invalid @enderror" 
                                id="nama" 
                                name="nama" 
-                               value="{{ old('nama') }}"
+                               value="{{ old('nama', $karyawan->nama) }}"
                                placeholder="Masukkan nama lengkap">
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -64,7 +65,7 @@
                                class="form-control @error('email') is-invalid @enderror" 
                                id="email" 
                                name="email" 
-                               value="{{ old('email') }}"
+                               value="{{ old('email', $karyawan->email) }}"
                                placeholder="contoh@email.com">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -80,7 +81,7 @@
                                class="form-control @error('jabatan') is-invalid @enderror" 
                                id="jabatan" 
                                name="jabatan" 
-                               value="{{ old('jabatan') }}"
+                               value="{{ old('jabatan', $karyawan->jabatan) }}"
                                placeholder="Contoh: Programmer, HRD, dll">
                         @error('jabatan')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -96,7 +97,7 @@
                                class="form-control @error('umur') is-invalid @enderror" 
                                id="umur" 
                                name="umur" 
-                               value="{{ old('umur') }}"
+                               value="{{ old('umur', $karyawan->umur) }}"
                                placeholder="Masukkan umur"
                                min="17"
                                max="100">
@@ -110,6 +111,17 @@
                         <label for="foto" class="form-label">
                             Foto Karyawan
                         </label>
+                        
+                        {{-- Tampilkan foto lama --}}
+                        @if($karyawan->foto)
+                            <div class="mb-2">
+                                <img src="{{ Storage::url('foto/' . $karyawan->foto) }}" 
+                                     alt="Foto Karyawan" 
+                                     class="img-thumbnail"
+                                     style="max-width: 150px;">
+                            </div>
+                        @endif
+                        
                         <input type="file" 
                                class="form-control @error('foto') is-invalid @enderror" 
                                id="foto" 
@@ -121,9 +133,9 @@
                         @enderror
                     </div>
 
-                    {{-- Preview Foto --}}
+                    {{-- Preview Foto Baru --}}
                     <div class="mb-3" id="previewContainer" style="display: none;">
-                        <label class="form-label">Preview:</label>
+                        <label class="form-label">Preview Foto Baru:</label>
                         <img id="preview" src="#" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
                     </div>
 
@@ -133,8 +145,8 @@
                         <a href="{{ route('karyawan.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Batal
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i> Simpan Data
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i> Update Data
                         </button>
                     </div>
                 </form>
@@ -146,7 +158,6 @@
 
 @push('scripts')
 <script>
-    // Preview foto sebelum upload
     document.getElementById('foto').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {

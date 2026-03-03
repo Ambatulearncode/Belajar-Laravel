@@ -11,10 +11,12 @@ class Karyawan extends Model
 
     // ? Tentukan kolom yang boleh diisi (Mass Assigment)
     protected $fillable = [
+        'departemen_id',
         'nama',
         'email',
         'jabatan',
-        'umur'
+        'umur',
+        'foto'
     ];
 
     // ? Mengubah tipe data otomatis
@@ -23,4 +25,16 @@ class Karyawan extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
+    // ? Relasi Many to One (Inverse): karyawan milik satu departemen
+    public function departemen()
+    {
+        return $this->belongsTo(Departemen::class);
+    }
+
+    // ? Accessor: Format foto URL
+    public function getFotoUrlAttribute()
+    {
+        return $this->foto ? asset('storage/foto/' . $this->foto) : asset('images/default.png');
+    }
 }
