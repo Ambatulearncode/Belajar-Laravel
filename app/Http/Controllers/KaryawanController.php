@@ -93,4 +93,17 @@ class KaryawanController extends Controller
             ->route('karyawan.index')
             ->with('success', 'Data karyawan berhasil diupdate!');
     }
+
+    public function destroy(Karyawan $karyawan)
+    {
+        if ($karyawan->foto) {
+            Storage::delete('public/foto' . $karyawan->foto);
+        }
+
+        $karyawan->delete();
+
+        return redirect()
+            ->route('karyawan.index')
+            ->with('success', 'Data karyawan berhasil dihapus!');
+    }
 }
